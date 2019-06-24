@@ -1,17 +1,36 @@
 module FontAwesome.Icon exposing
-    ( view, viewStyled, viewTransformed, viewMasked, viewTitled, viewWithId
-    , Icon
+    ( Icon
+    , viewIcon, viewStyled, viewTransformed
+    , Presentation, WithId, WithoutId
+    , present, view
+    , styled, transform
+    , withId
+    , titled, masked
     )
 
 {-| Rendering icons for use in HTML.
 
-Note the various view methods are all just convenience wrappers of `viewWithId`. It may make sense to create your own
-wrapper method with just the functionality you need if the given ones don't match your use case.
+Most users will be able to just use the simple `viewIcon`, `viewStyled` and `viewTransformed` methods, but if you want
+to use the more powerful features, this library uses a pipeline style to define the various potential parameters for
+rendering an icon. In general, the base for rendering an icon is:
 
-The "defaults" as called by `view` would be: `viewWithId icon.name [] [] Nothing Nothing icon`.
+    icon |> present |> view
 
-@docs view, viewStyled, viewTransformed, viewMasked, viewTitled, viewWithId
+Extra steps can be placed between `present` and `view` to customise the way the icon is rendered.
+
 @docs Icon
+
+@docs viewIcon, viewStyled, viewTransformed
+
+@docs Presentation, WithId, WithoutId
+
+@docs present, view
+
+@docs styled, transform
+
+@docs withId
+
+@docs titled, masked
 
 -}
 
@@ -24,6 +43,10 @@ import Svg.Attributes as SvgA
 
 
 {-| The definition of an icon.
+
+You should never need to define these or change them yourself. You will find these in the modules for the different
+Icon packs (e.g: `FontAwesome.Solid`).
+
 -}
 type alias Icon =
     { prefix : String
@@ -34,137 +57,235 @@ type alias Icon =
     }
 
 
-{-| A convenience method for simply rendering the icon.
+{-| A convenience function to render an icon.
+
+`viewIcon icon` is directly equivalent to directly equivalent to `icon |> present |> view`.
+
 -}
-view : Icon -> Html msg
-view =
-    viewStyled []
+viewIcon : Icon -> Html msg
+viewIcon =
+    present >> view
 
 
-{-| A convenience method for simply rendering the icon with some additional styles.
+{-| A convenience function to render an icon with some custom styles.
 
-If you want to add a class, make sure to use `Svg.Attributes.class` not `Html.Attributes.class`.
+`viewStyled styles icon` is directly equivalent to directly equivalent to
+`icon |> present |> styled styles |> view`.
 
 -}
 viewStyled : List (Svg.Attribute msg) -> Icon -> Html msg
-viewStyled attrs =
-    viewTransformed attrs []
+viewStyled styles =
+    present >> styled styles >> view
 
 
-{-| Render the icon with some transforms. Also takes additional attributes to be applied to the SVG node, should you
-wish to supply any.
+{-| A convenience function to render an icon with some custom styles.
 
-If you want to add a class, make sure to use `Svg.Attributes.class` not `Html.Attributes.class`.
+`viewTransformed styles transforms icon` is directly equivalent to
+`icon |> present |> styled styles |> transform transforms |> view`.
 
 -}
 viewTransformed : List (Svg.Attribute msg) -> List Transform -> Icon -> Html msg
-viewTransformed attrs transforms icon =
-    viewMasked attrs transforms Nothing icon
+viewTransformed styles transforms =
+    present >> styled styles >> transform transforms >> view
 
 
-{-| Render one icon as a mask over the other - this means that the inner icon (given second) is cut out of the outer
-icon. The big difference between this and layering is that the background can show through, as the cut out icon becomes
-a truly transparent area (not just the same color as the background).
+{-| Information on how an icon should be rendered. In general, you shouldn't need to interact directly with this type -
+it should generally only exist in a chain of operations to display an icon.
 
-Note this sets IDs in order to achieve masking. If you use the same inner icon more than once on a page,
-you should use `viewWithId` instead and pass a unique ID for each element to avoid repeated IDs.
-
-If you want to add a class, make sure to use `Svg.Attributes.class` not `Html.Attributes.class`.
+Adding titles or using masking require that the icon has a unique id. This is because references are made in the HTML
+via the HTML `id` attribute, which must be unique on the page. Views with an id will have the `WithId`
+type and will therefore work with those options, while ones that have the `WithoutId` type won't.
 
 -}
-viewMasked : List (Svg.Attribute msg) -> List Transform -> Maybe Icon -> Icon -> Html msg
-viewMasked attrs transforms outer inner =
-    viewTitled attrs transforms Nothing outer inner
+type Presentation identification msg
+    = Presentation
+        { icon : Icon
+        , attributes : List (Svg.Attribute msg)
+        , transforms : List Transform
+        , role : String
+        , id : Maybe String
+        , title : Maybe String
+        , outer : Maybe Icon
+        }
 
 
-{-| Render as in viewMasked, but with an optional title element in the SVG for accessibility.
+{-| Indicates that the presentation has an id, which lets you use `titled` and `masked`. For more on why those features
+are "locked" like this, see the documentation for the `View` type above.
+-}
+type WithId
+    = WithId
 
-If a title is provided, the element is considered a semantic icon, and `aria-hidden` will not be set.
-If a title is not provided then the element is assumed to be purely decorative, and `aria-hidden` is set.
 
-Note this sets an ID for the `aria-labelledby` element. If you use the same inner icon titled more than once on a page,
-you should use `viewWithId` instead and pass a unique ID for each element to avoid repeated IDs.
+{-| Indicates that the presentation does not have an id, which means you can't use `titled` and `masked`. For more on
+why those features are "locked" like this, see the documentation for the `View` type above.
+-}
+type WithoutId
+    = WithoutId
 
-If you want to add a class, make sure to use `Svg.Attributes.class` not `Html.Attributes.class`.
+
+{-| Gets a basic presentation of an icon.
+
+If you do nothing else an pass this to view, the icon will be presented as semantically meaningless (i.e: purely
+decorative) and will be hidden from accessibility tools. If you need the icon to have semantic meaning then using
+`titled` will change that.
 
 -}
-viewTitled : List (Svg.Attribute msg) -> List Transform -> Maybe String -> Maybe Icon -> Icon -> Html msg
-viewTitled attrs transforms title outer inner =
-    viewWithId inner.name attrs transforms title outer inner
+present : Icon -> Presentation WithoutId msg
+present icon =
+    Presentation
+        { icon = icon
+        , attributes = []
+        , transforms = []
+        , role = "img"
+        , id = Nothing
+        , title = Nothing
+        , outer = Nothing
+        }
 
 
-{-| Render as in viewTitled, but with a provided unique ID. This allows you to avoid overlapping IDs if the same
-elements are repeated for correctness.
+{-| Render the given icon presentation to HTML. Take a look at `present` to get that presentation.
+-}
+view : Presentation identification msg -> Html msg
+view presentation =
+    internalView presentation
 
-If you want to add a class, make sure to use `Svg.Attributes.class` not `Html.Attributes.class`.
+
+{-| Add the given attributes to the icon's presentation. These will be applied to the icon when viewed.
+
+Note the icon is an `svg` tag, and it appears that using `Html.Attribute.class` will remove any `Svg.Attribute.class`
+values that are set, including FontAwesome ones that make the icon work, so make sure to use `Svg.Attribute.class` with
+this.
 
 -}
-viewWithId : String -> List (Svg.Attribute msg) -> List Transform -> Maybe String -> Maybe Icon -> Icon -> Html msg
-viewWithId id attrs transforms title outer inner =
-    let
-        ( width, height ) =
-            case outer of
-                Just mask ->
-                    ( mask.width, mask.height )
+styled : List (Svg.Attribute msg) -> Presentation identification msg -> Presentation identification msg
+styled attributes (Presentation presentation) =
+    Presentation { presentation | attributes = presentation.attributes ++ attributes }
 
-                Nothing ->
-                    ( inner.width, inner.height )
 
-        titleId =
-            id ++ "-title"
+{-| Add the given transforms to the icon's presentation. These will be applied to the icon when viewed.
+-}
+transform : List Transform -> Presentation identification msg -> Presentation identification msg
+transform transforms (Presentation presentation) =
+    Presentation { presentation | transforms = presentation.transforms ++ transforms }
 
-        attrsAdded =
-            case title of
-                Just _ ->
-                    HtmlA.attribute "aria-labelledby" titleId :: attrs
 
-                Nothing ->
-                    HtmlA.attribute "aria-hidden" "true" :: attrs
+{-| Set [the HTML role](https://www.w3.org/TR/wai-aria/#usage_intro) for the icon. By default, this is `"img"`.
+-}
+withRole : String -> Presentation identification msg -> Presentation identification msg
+withRole role (Presentation presentation) =
+    Presentation { presentation | role = role }
 
-        svgTransform =
-            transforms |> meaningfulTransform |> Maybe.map (transformForSvg width inner.width)
 
-        classes =
-            "svg-inline--fa fa-" ++ inner.name ++ " fa-w-" ++ (ceiling (toFloat width / toFloat height * 16) |> String.fromInt)
+{-| Set the HTML id for the icon presentation to the given value. This must be unique on the page.
 
-        contents =
-            case outer of
-                Just mask ->
-                    viewMaskedWithTransform id (svgTransform |> Maybe.withDefault (transformForSvg width inner.width meaninglessTransform)) mask inner
+The FontAwesome JavaScript library generates random ids for this. Doing this in elm is a little more cumbersome, but
+is possible if you need to dynamically generate items and don't have existing ids to work from. Please see
+[the `elm-fontawesome-example` repository](https://github.com/Lattyware/elm-fontawesome-example) for an example of this.
 
-                Nothing ->
-                    [ viewWithTransform svgTransform inner ]
+-}
+withId : String -> Presentation WithoutId msg -> Presentation WithId msg
+withId id (Presentation presentation) =
+    Presentation { presentation | id = Just id }
 
-        contentsWithTitle =
-            case title of
-                Just t ->
-                    Svg.title [ SvgA.id titleId ] [ Svg.text t ] :: contents
 
-                Nothing ->
-                    contents
-    in
-    Svg.svg
-        ([ SvgA.class classes
-         , HtmlA.attribute "role" "img"
-         , HtmlA.attribute "xmlns" "http://www.w3.org/2000/svg"
-         , SvgA.viewBox ("0 0 " ++ String.fromInt width ++ " " ++ String.fromInt height)
-         ]
-            ++ attrsAdded
-        )
-        contentsWithTitle
+{-| Sets the title of the presented icon. This will make the icon semantically meaningful, and as such it won't be
+hidden from accessibility tools.
+
+Note that this can only be applied where the icon has an id unique on the page as it uses that id under the hood in the
+HTML. Use `withId` to add one.
+
+-}
+titled : String -> Presentation WithId msg -> Presentation WithId msg
+titled title (Presentation presentation) =
+    Presentation { presentation | title = Just title }
+
+
+{-| Sets an outer icon that the main icon is masking (i.e.: the initial icon will become a "cut out" of this outer
+icon). This creates true transparency.
+
+Note that this can only be applied where the icon has an id unique on the page as it uses that id under the hood in the
+HTML. Use `withId` to add one.
+
+-}
+masked : Icon -> Presentation WithId msg -> Presentation WithId msg
+masked outer (Presentation presentation) =
+    Presentation { presentation | outer = Just outer }
 
 
 
 {- Private -}
 
 
+internalView : Presentation identification msg -> Html msg
+internalView (Presentation { icon, attributes, transforms, role, id, title, outer }) =
+    let
+        ( width, height ) =
+            outer |> Maybe.map (\o -> ( o.width, o.height )) |> Maybe.withDefault ( icon.width, icon.height )
+
+        -- We type guard this with the WithId/WithoutId stuff, so if this gets used, it should never be Nothing.
+        alwaysId =
+            id |> Maybe.withDefault icon.name
+
+        titleId =
+            alwaysId ++ "-title"
+
+        semantics =
+            title
+                |> Maybe.map (always (HtmlA.attribute "aria-labelledby" titleId))
+                |> Maybe.withDefault (HtmlA.attribute "aria-hidden" "true")
+
+        svgTransform =
+            transforms |> meaningfulTransform |> Maybe.map (transformForSvg width icon.width)
+
+        classes =
+            [ "svg-inline--fa"
+            , "fa-" ++ icon.name
+            , "fa-w-" ++ (ceiling (toFloat width / toFloat height * 16) |> String.fromInt)
+            ]
+
+        contents =
+            let
+                resolvedSvgTransform =
+                    svgTransform |> Maybe.withDefault (transformForSvg width icon.width meaninglessTransform)
+            in
+            outer
+                |> Maybe.map (viewMaskedWithTransform alwaysId resolvedSvgTransform icon)
+                |> Maybe.withDefault [ viewWithTransform svgTransform icon ]
+
+        potentiallyTitledContents =
+            title |> Maybe.map (titledContents titleId contents) |> Maybe.withDefault contents
+    in
+    Svg.svg
+        (List.concat
+            [ [ HtmlA.attribute "role" role
+              , HtmlA.attribute "xmlns" "http://www.w3.org/2000/svg"
+              , SvgA.viewBox ("0 0 " ++ String.fromInt width ++ " " ++ String.fromInt height)
+              , semantics
+              ]
+            , classes |> List.map SvgA.class
+            , attributes
+            ]
+        )
+        potentiallyTitledContents
+
+
+titledContents : String -> List (Html msg) -> String -> List (Html msg)
+titledContents titleId contents title =
+    Svg.title [ SvgA.id titleId ] [ Svg.text title ] :: contents
+
+
+allSpace : List (Svg.Attribute msg)
+allSpace =
+    [ SvgA.x "0", SvgA.y "0", SvgA.width "100%", SvgA.height "100%" ]
+
+
 viewWithTransform : Maybe (SvgTransformStyles msg) -> Icon -> Svg msg
-viewWithTransform transform icon =
-    case transform of
-        Just trans ->
-            Svg.g [ trans.outer ]
-                [ Svg.g [ trans.inner ]
-                    [ corePath [ trans.path ] icon
+viewWithTransform transforms icon =
+    case transforms of
+        Just ts ->
+            Svg.g [ ts.outer ]
+                [ Svg.g [ ts.inner ]
+                    [ corePath [ ts.path ] icon
                     ]
                 ]
 
@@ -174,25 +295,14 @@ viewWithTransform transform icon =
 
 corePath : List (Svg.Attribute msg) -> Icon -> Svg msg
 corePath attrs icon =
-    Svg.path ([ SvgA.fill "currentColor", SvgA.d icon.path ] ++ attrs) []
-
-
-allSpace : List (Svg.Attribute msg)
-allSpace =
-    [ SvgA.x "0", SvgA.y "0", SvgA.width "100%", SvgA.height "100%" ]
+    Svg.path (SvgA.fill "currentColor" :: SvgA.d icon.path :: attrs) []
 
 
 viewMaskedWithTransform : String -> SvgTransformStyles msg -> Icon -> Icon -> List (Svg msg)
-viewMaskedWithTransform id transform outer inner =
+viewMaskedWithTransform id transforms inner outer =
     let
-        maskRect =
-            Svg.rect (SvgA.fill "white" :: allSpace) []
-
         maskInnerGroup =
-            Svg.g [ transform.inner ] [ Svg.path [ transform.path, SvgA.fill "black", SvgA.d inner.path ] [] ]
-
-        maskOuterGroup =
-            Svg.g [ transform.outer ] [ maskInnerGroup ]
+            Svg.g [ transforms.inner ] [ Svg.path [ transforms.path, SvgA.fill "black", SvgA.d inner.path ] [] ]
 
         maskId =
             "mask-" ++ inner.name ++ "-" ++ id
@@ -203,18 +313,20 @@ viewMaskedWithTransform id transform outer inner =
         maskTag =
             Svg.mask
                 ([ SvgA.id maskId, SvgA.maskUnits "userSpaceOnUse", SvgA.maskContentUnits "userSpaceOnUse" ] ++ allSpace)
-                [ maskRect, maskOuterGroup ]
+                [ Svg.rect (SvgA.fill "white" :: allSpace) [], Svg.g [ transforms.outer ] [ maskInnerGroup ] ]
 
         defs =
             Svg.defs [] [ Svg.clipPath [ SvgA.id clipId ] [ corePath [] outer ], maskTag ]
     in
     [ defs
     , Svg.rect
-        ([ SvgA.fill "currentColor"
-         , SvgA.clipPath ("url(#" ++ clipId ++ ")")
-         , SvgA.mask ("url(#" ++ maskId ++ ")")
-         ]
-            ++ allSpace
+        (List.concat
+            [ [ SvgA.fill "currentColor"
+              , SvgA.clipPath ("url(#" ++ clipId ++ ")")
+              , SvgA.mask ("url(#" ++ maskId ++ ")")
+              ]
+            , allSpace
+            ]
         )
         []
     ]

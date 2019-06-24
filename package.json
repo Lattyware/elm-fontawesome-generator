@@ -1,16 +1,24 @@
 {
-  "name": "elm-fontawesome",
-  "version": "1.0.0",
+  "name": "elm-fontawesome-generator",
+  "version": "3.0.0",
   "description": "Generate elm modules for FontAwesome icons.",
   "main": "src/elm-fontawesome.js",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
   "license": "GPL-3.0-or-later",
+  "scripts": {
+    "compile": "babel src --out-dir build --source-maps",
+    "prepare": "npm run compile",
+    "test": "npm run build && mocha --require @babel/register",
+    "build": "npm run compile && node --harmony build/js/free.js && npm run post-build",
+    "build-pro": "npm run compile && node --harmony build/js/pro.js && npm run post-build",
+    "post-build": "cp -r resources/. dist && cp .gitignore dist"
+  },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.17",
+    "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "common-tags": "^1.8.0",
-    "core-js": "^3.0.1",
+    "core-js": "^3.1.4",
     "elm-format": "^0.8.1",
-    "fs-extra": "^7.0.1",
+    "fs-extra": "^8.0.1",
     "loader-utils": "^1.2.3",
     "make-promises-safe": "^5.0.0",
     "prettier-plugin-elm": "^0.4.2",
@@ -19,31 +27,25 @@
     "source-map-support": "^0.5.12"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.3",
-    "@babel/core": "^7.4.3",
-    "@babel/plugin-proposal-unicode-property-regex": "^7.4.0",
-    "@babel/preset-env": "^7.4.3",
-    "@babel/register": "^7.4.0",
-    "babel-plugin-dynamic-import-node": "^2.2.0",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-throw-expressions": "^7.2.0",
+    "@babel/plugin-proposal-unicode-property-regex": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "babel-plugin-dynamic-import-node": "^2.3.0",
     "babel-plugin-transform-util-promisify": "^0.2.2",
-    "elm": "^0.19.0",
+    "elm": "^0.19.0-no-deps",
     "mocha": "^6.1.4",
-    "prettier": "^1.17.0"
+    "prettier": "^1.18.2"
   },
   "optionalDependencies": {
-    "@fortawesome/free-brands-svg-icons": "^5.8.1",
-    "@fortawesome/free-regular-svg-icons": "^5.8.1",
-    "@fortawesome/free-solid-svg-icons": "^5.8.1",
-    "@fortawesome/pro-light-svg-icons": "^5.8.1",
-    "@fortawesome/pro-regular-svg-icons": "^5.8.1",
-    "@fortawesome/pro-solid-svg-icons": "^5.8.1"
-  },
-  "scripts": {
-    "compile": "babel src --out-dir build --source-maps",
-    "prepare": "npm run compile",
-    "test": "npm run build && mocha --require @babel/register",
-    "build": "npm run compile && node --harmony build/js/free.js && cp README.md dist && cp resources/LICENSE dist && cp .gitignore dist",
-    "build-pro": "npm run compile && node --harmony build/js/pro.js"
+    "@fortawesome/free-brands-svg-icons": "^5.9.0",
+    "@fortawesome/free-regular-svg-icons": "^5.9.0",
+    "@fortawesome/free-solid-svg-icons": "^5.9.0",
+    "@fortawesome/pro-light-svg-icons": "^5.9.0",
+    "@fortawesome/pro-regular-svg-icons": "^5.9.0",
+    "@fortawesome/pro-solid-svg-icons": "^5.9.0"
   },
   "browserslist": [
     "maintained node versions"
@@ -62,7 +64,8 @@
     "plugins": [
       "transform-util-promisify",
       "dynamic-import-node",
-      "@babel/plugin-proposal-unicode-property-regex"
+      "@babel/plugin-proposal-unicode-property-regex",
+      "@babel/plugin-proposal-throw-expressions"
     ]
   }
 }

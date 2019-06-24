@@ -1,0 +1,20 @@
+language: node_js
+node_js: "12"
+
+cache: npm
+
+if: tag IS present
+
+install:
+  - npm install -g elm
+
+script:
+  - elm publish
+
+deploy:
+  provider: script
+  script: deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true

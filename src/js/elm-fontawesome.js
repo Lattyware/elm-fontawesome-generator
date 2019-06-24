@@ -5,224 +5,38 @@ import "regenerator-runtime/runtime";
 import "make-promises-safe";
 import "source-map-support/register";
 import { exec as exec_internal } from "child_process";
-import { stripIndents } from "common-tags";
 import * as fs from "fs-extra";
-import { dom } from "@fortawesome/fontawesome-svg-core";
 import { promisify } from "util";
+import { attributes } from "./template/attributes";
+import {styles} from "./template/styles";
+import * as elm from "./template/elm";
+import {icons} from "./template/icons";
 
 const exec = promisify(exec_internal);
 
 const srcElm = "src/elm/";
 const dist = "dist/";
 const distSrc = `${dist}src/`;
-const iconModuleName = "Icon";
-const attributesName = "Attributes";
-const stylesName = "Styles";
-const layeringName = "Layering";
-const transformsName = "Transforms";
 
-const attrLinkPrefix = "https://fontawesome.com/how-to-use/on-the-web/styling/";
-const attrs = [
-  {
-    title: "Sizing Icons",
-    link: "sizing-icons",
-    functions: [
-      "xs",
-      "sm",
-      "lg",
-      "2x",
-      "3x",
-      "4x",
-      "5x",
-      "6x",
-      "7x",
-      "8x",
-      "9x",
-      "10x"
-    ]
-  },
-  {
-    title: "Fixed Width Icons",
-    link: "fixed-width-icons",
-    functions: ["fw"]
-  },
-  {
-    title: "Icons in a List",
-    link: "icons-in-a-list",
-    functions: ["ul", "li"]
-  },
-  {
-    title: "Rotating Icons",
-    link: "rotating-icons",
-    functions: [
-      "rotate-90",
-      "rotate-180",
-      "rotate-270",
-      "flip-horizontal",
-      "flip-vertical"
-    ]
-  },
-  {
-    title: "Animating Icons",
-    link: "animating-icons",
-    functions: ["spin", "pulse"]
-  },
-  {
-    title: "Bordered + Pulled Icons",
-    link: "bordered-pulled-icons",
-    functions: ["pull-left", "pull-right", "border"]
-  },
-  {
-    title: "Stacked Icons",
-    link: "stacking-icons",
-    functions: ["stack", "stack-1x", "stack-2x", "inverse"]
+const module = (name, write) => {
+  const path = ["FontAwesome", ...name];
+  return {
+    path,
+    write: () => write(path)
   }
-];
-
-function build(packs) {
-  buildPacks(packs)
-    .then(_ => console.log("Successful build."))
-    .catch(err => {
-      throw err;
-    });
-}
-
-const modulePath = name => ["FontAwesome", name];
-const moduleElm = name => modulePath(name).join(".");
-const moduleFile = name => `${modulePath(name).join("/")}.elm`;
-
-const writeModule = (name, contents) =>
-  fs.outputFile(`${distSrc}${moduleFile(name)}`, contents);
-
-const docSection = section => {
-  const funcs = section.extra || [];
-  funcs.push(...section.functions.map(asIdentifier));
-  return stripIndents`
-      # ${section.title}
-      [See the FontAwesome docs for details.](${attrLinkPrefix}${section.link})
-      @docs ${funcs.join(",")}
-      `;
 };
 
-const module = (name, icons) => stripIndents`
-    module ${moduleElm(name)} exposing (..)
-       
-    {-| Icons from the "${name}" pack. 
-    @docs ${icons.map(i => asIdentifier(i.iconName)).join(",")}
-    -}
+const staticModule = (name) => module(name, async (path) => {
+  const fileName = elm.moduleFileName(path);
+  await fs.copy(`${srcElm}${fileName}`, `${distSrc}${fileName}`)
+});
 
-    import ${moduleElm("Icon")} exposing (..)
-   
-    ${icons.map(iconDefinition).join("\n\n")}
-  `;
-
-function attributes() {
-  return stripIndents`
-    module ${moduleElm(attributesName)} exposing (..)
-    
-    {-| Styling attributes for icons. 
-    ${attrs.map(docSection).join("\n\n")}
-    -}
-    
-    import Svg
-    import Svg.Attributes as SvgA
-    
-    ${attrs
-      .flatMap(section => section.functions)
-      .map(attribute)
-      .join("\n\n")}
-  `;
-}
-
-function attribute(name) {
-  const fullName = `fa-${name}`;
-  const identifier = asIdentifier(name);
-  return stripIndents`
-    {-| Apply the \`${fullName}\` class to the element. -}
-    ${identifier} : Svg.Attribute msg
-    ${identifier} = SvgA.class "${fullName}"
-  `;
-}
-
-function styles() {
-  const css = dom
-    .css()
-    .replace(/(\r\n\t|\n|\r\t)/gm, "")
-    .replace(/"/g, '\\"');
-  return stripIndents`
-    module ${moduleElm(stylesName)} exposing (..)
-    
-    {-| Helpers for adding the CSS required for FontAwesome to your page. 
-    @docs css
-    -}
-    
-    import Html exposing (Html)
-    
-    {-| Generates the accompanying CSS that is necessary to correctly display icons. -}
-    css : Html msg
-    css = Html.node "style" [] [ Html.text "${css}" ]
-  `;
-}
-
-async function buildPacks(packs) {
-  await fs.remove(dist);
-  await fs.copy(srcElm, distSrc, { overwrite: true });
-  const loadedPacks = await Promise.all(
-    packs.map(moduleFromPack),
-    writeModule(attributesName, attributes()),
-    writeModule(stylesName, styles())
-  );
-  const names = loadedPacks
-    .filter(pack => pack != null)
-    .map(pack => pack.name)
-    .concat(
-      attributesName,
-      stylesName,
-      layeringName,
-      iconModuleName,
-      transformsName
-    );
-  await elmJson(names);
-  await Promise.all(
-    names.map(name =>
-      exec(`elm-format src/${moduleFile(name)} --yes`, { cwd: dist })
-    )
-  );
-}
-
-async function moduleFromPack(pack) {
-  let imported;
-  try {
-    imported = await import(pack.pkg);
-  } catch (err) {
-    console.log(`"${pack.pkg}" not available and won't be included: ${err}.`);
-    return null;
-  }
-  const icons = Object.values(imported[pack.pack]);
-  await writeModule(pack.name, module(pack.name, icons));
-  console.log(`Successfully generated "${pack.name}" module.`);
-  return pack;
-}
-
-async function elmJson(names) {
-  const modules = names.map(name => moduleElm(name));
-  const elm = {
-    type: "package",
-    name: "lattyware/elm-fontawesome",
-    summary: "FontAwesome 5 SVG icons.",
-    license: "MIT",
-    version: "2.3.0",
-    "exposed-modules": modules,
-    "elm-version": "0.19.0 <= v < 0.20.0",
-    dependencies: {
-      "elm/core": "1.0.2 <= v < 2.0.0",
-      "elm/html": "1.0.0 <= v < 2.0.0",
-      "elm/svg": "1.0.1 <= v < 2.0.0"
-    },
-    "test-dependencies": {}
-  };
-  await fs.outputFile(`${dist}elm.json`, JSON.stringify(elm, null, 2));
-}
+const templateModule = (name, template) => module(name, async (path) => {
+  const fileName = elm.moduleFileName(path);
+  const contents = await template(path);
+  await fs.outputFile(`${distSrc}${fileName}`, contents);
+  await exec(`elm-format src/${fileName} --yes`, { cwd: dist })
+});
 
 function styleSuffix(prefix) {
   switch (prefix) {
@@ -235,32 +49,59 @@ function styleSuffix(prefix) {
     case "fab":
       return "?style=brands";
     default:
-      return "";
+      throw new Error(`Unknown FontAwesome pack: "${prefix}".`)
   }
 }
 
 function iconDefinition(iconDef) {
+  const [width, height, _ligatures, _unicode, d] = iconDef.icon;
+  const name = iconDef.iconName;
   const prefix = iconDef.prefix;
-  const iconName = iconDef.iconName;
-  const identifier = asIdentifier(iconName);
-  const [width, height, ligatures, unicode, d] = iconDef.icon;
+  const link = `${name}${styleSuffix(prefix)}`;
 
-  const link = `${iconName}${styleSuffix(prefix)}`;
-
-  return stripIndents`
-    {-| The [\`${iconName}\`](https://fontawesome.com/icons/${link}) icon. -}
-    ${identifier} : Icon
-    ${identifier} = Icon "${prefix}" "${iconName}" ${width} ${height} "${d}"
-  `;
+  return {
+    name,
+    id: elm.identifier(name),
+    link,
+    prefix,
+    width,
+    height,
+    d
+  };
 }
 
-function asIdentifier(str) {
-  const capWords = str
-    .split(/[^\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nd}\p{Nl}_]/u)
-    .map(n => n[0].toUpperCase() + n.slice(1))
-    .join("");
-  const camelCase = capWords[0].toLowerCase() + capWords.slice(1);
-  return /^\p{Ll}.*$/u.test(camelCase) ? camelCase : "fa" + camelCase;
-}
+const packModule = (pack) => templateModule([pack.name], async (path) => {
+  const imported = await import(pack.pkg);
+  const iconDefs = Object.values(imported[pack.pack]);
+  return icons(path, {
+    name: pack.name,
+    icons: iconDefs.map(iconDefinition)
+  });
+});
 
-export { build };
+const coreModules = {
+  internal: [
+    staticModule(["Transforms", "Internal"])
+  ],
+  exported: [
+    staticModule([ "Icon" ]),
+    templateModule( ["Attributes"], attributes),
+    templateModule(["Styles"], styles),
+    staticModule(["Layering"]),
+    staticModule(["Transforms"])
+  ]
+};
+
+export async function build(packs) {
+  await fs.remove(dist);
+
+  const exported = Array.from(coreModules.exported);
+  exported.push(...packs.map(packModule));
+
+  const modules = [...exported, ...coreModules.internal];
+
+  // We need to have the elm.json in place so we can run elm-format on the modules.
+  await fs.outputFile(`${dist}elm.json`, elm.packageDefinition("3.0.0", exported.map(m => m.path)));
+
+  await Promise.all(modules.map(module => module.write()));
+}

@@ -9,6 +9,11 @@ module FontAwesome.Icon.Pipeline exposing
 
 This module provides a pipeline system that makes it easier to work with the more complex features of the library.
 
+The API is a little unusual as using certain features (titles, masks) of the library requires a unique id for your
+icon. In the official Javascript library for FontAwesome random ids are generated, but due to the pure nature of elm
+code, we can't do that without adding a lot of cruft to the API, even in simple cases. Instead we leave the task of
+managing ids to the end user. You should ensure each id used is unique to the page it is on.
+
 You start your pipeline using `present`.
 
 @docs present
@@ -48,7 +53,7 @@ viewId presentation =
 
 
 {-| Get a basic presentation record for the icon. By default, this is considered semantically meaningless (it is just
-a decorative element) and will be hidden from accessibility tools.
+a decorative element) and will be hidden from accessibility tools. Use `titled` to change that.
 -}
 present : Icon -> Presentation Anonymous msg
 present icon =
@@ -59,6 +64,13 @@ present icon =
 
 
 {-| Set the ID for the presentation record to the given value. This must be unique on the page.
+
+If you want to do what the offical FontAwesome JS library does, you can generate random twelve character alphanumeric
+ASCII ids for each icon. The easiest way to do this is with
+[`elm-community/random-extra`'s `Random.String.string`](https://package.elm-lang.org/packages/elm-community/random-extra/latest/Random-String):
+
+    Random.String.string 12 (Random.Extra.choices Random.String.latin [ Random.String.char 48 57 ])
+
 -}
 withId : String -> Presentation Anonymous msg -> Presentation Identified msg
 withId id presentation =
