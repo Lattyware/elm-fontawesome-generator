@@ -12,6 +12,8 @@ import {styles} from "./template/styles";
 import * as elm from "./template/elm";
 import {icons} from "./template/icons";
 
+const version = "3.0.1";
+
 const exec = promisify(exec_internal);
 
 const srcElm = "src/elm/";
@@ -101,7 +103,7 @@ export async function build(packs) {
   const modules = [...exported, ...coreModules.internal];
 
   // We need to have the elm.json in place so we can run elm-format on the modules.
-  await fs.outputFile(`${dist}elm.json`, elm.packageDefinition("3.0.0", exported.map(m => m.path)));
+  await fs.outputFile(`${dist}elm.json`, elm.packageDefinition(version, exported.map(m => m.path)));
 
   await Promise.all(modules.map(module => module.write()));
 }
