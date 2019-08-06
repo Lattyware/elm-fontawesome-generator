@@ -15,6 +15,11 @@ build([
     pack: "far"
   },
   {
+    name: "Duotone",
+    pkg: "@fortawesome/pro-duotone-svg-icons",
+    pack: "fad"
+  },
+  {
     name: "Light",
     pkg: "@fortawesome/pro-light-svg-icons",
     pack: "fal"

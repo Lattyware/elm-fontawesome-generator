@@ -50,6 +50,8 @@ function styleSuffix(prefix) {
       return "?style=light";
     case "fab":
       return "?style=brands";
+    case "fad":
+      return "?style=duotone";
     default:
       throw new Error(`Unknown FontAwesome pack: "${prefix}".`)
   }
