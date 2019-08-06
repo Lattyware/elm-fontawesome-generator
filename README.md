@@ -34,7 +34,9 @@ To build the elm package, you will need to first make sure you have the icon pac
 The possible packages are included as optional dependencies on the node module. For pro icons you will need to have the 
 [Fort Awesome Pro NPM registry][pro-npm] configured.
 
-Then run `npm build` or for the free version `npm build-pro` for the pro version. The resulting elm library will be 
+You must then run `npm install --save-dev` to install the development dependencies.
+
+Then run `npm run-script build` for the free version or `npm run-script build-pro` for the pro version. The resulting elm library will be 
 output in `dist`. Unfortunately there is no nice way to work with local packages in Elm as of the time of writing, so
 you will need to copy the source into your application or use an alternative system.
 
