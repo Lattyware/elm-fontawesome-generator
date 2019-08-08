@@ -8,11 +8,11 @@ import { exec as exec_internal } from "child_process";
 import * as fs from "fs-extra";
 import { promisify } from "util";
 import { attributes } from "./template/attributes";
-import {styles} from "./template/styles";
+import { styles } from "./template/styles";
 import * as elm from "./template/elm";
-import {icons} from "./template/icons";
+import { icons } from "./template/icons";
 
-const version = "3.0.2";
+const version = "3.1.0";
 
 const exec = promisify(exec_internal);
 
@@ -25,20 +25,22 @@ const module = (name, write) => {
   return {
     path,
     write: () => write(path)
-  }
+  };
 };
 
-const staticModule = (name) => module(name, async (path) => {
-  const fileName = elm.moduleFileName(path);
-  await fs.copy(`${srcElm}${fileName}`, `${distSrc}${fileName}`)
-});
+const staticModule = name =>
+  module(name, async path => {
+    const fileName = elm.moduleFileName(path);
+    await fs.copy(`${srcElm}${fileName}`, `${distSrc}${fileName}`);
+  });
 
-const templateModule = (name, template) => module(name, async (path) => {
-  const fileName = elm.moduleFileName(path);
-  const contents = await template(path);
-  await fs.outputFile(`${distSrc}${fileName}`, contents);
-  await exec(`elm-format src/${fileName} --yes`, { cwd: dist })
-});
+const templateModule = (name, template) =>
+  module(name, async path => {
+    const fileName = elm.moduleFileName(path);
+    const contents = await template(path);
+    await fs.outputFile(`${distSrc}${fileName}`, contents);
+    await exec(`elm-format src/${fileName} --yes`, { cwd: dist });
+  });
 
 function styleSuffix(prefix) {
   switch (prefix) {
@@ -51,7 +53,7 @@ function styleSuffix(prefix) {
     case "fab":
       return "?style=brands";
     default:
-      throw new Error(`Unknown FontAwesome pack: "${prefix}".`)
+      throw new Error(`Unknown FontAwesome pack: "${prefix}".`);
   }
 }
 
@@ -72,22 +74,21 @@ function iconDefinition(iconDef) {
   };
 }
 
-const packModule = (pack) => templateModule([pack.name], async (path) => {
-  const imported = await import(pack.pkg);
-  const iconDefs = Object.values(imported[pack.pack]);
-  return icons(path, {
-    name: pack.name,
-    icons: iconDefs.map(iconDefinition)
+const packModule = pack =>
+  templateModule([pack.name], async path => {
+    const imported = await import(pack.pkg);
+    const iconDefs = Object.values(imported[pack.pack]);
+    return icons(path, {
+      name: pack.name,
+      icons: iconDefs.map(iconDefinition)
+    });
   });
-});
 
 const coreModules = {
-  internal: [
-    staticModule(["Transforms", "Internal"])
-  ],
+  internal: [staticModule(["Transforms", "Internal"])],
   exported: [
-    staticModule([ "Icon" ]),
-    templateModule( ["Attributes"], attributes),
+    staticModule(["Icon"]),
+    templateModule(["Attributes"], attributes),
     templateModule(["Styles"], styles),
     staticModule(["Layering"]),
     staticModule(["Transforms"])
@@ -103,7 +104,10 @@ export async function build(packs) {
   const modules = [...exported, ...coreModules.internal];
 
   // We need to have the elm.json in place so we can run elm-format on the modules.
-  await fs.outputFile(`${dist}elm.json`, elm.packageDefinition(version, exported.map(m => m.path)));
+  await fs.outputFile(
+    `${dist}elm.json`,
+    elm.packageDefinition(version, exported.map(m => m.path))
+  );
 
   await Promise.all(modules.map(module => module.write()));
 }

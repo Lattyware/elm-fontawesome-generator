@@ -1,6 +1,6 @@
 {
   "name": "elm-fontawesome-generator",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Generate elm modules for FontAwesome icons.",
   "main": "src/elm-fontawesome.js",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
@@ -14,38 +14,38 @@
     "post-build": "cp -r resources/. dist && cp .gitignore dist"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.19",
+    "@fortawesome/fontawesome-svg-core": "^1.2.21",
     "common-tags": "^1.8.0",
     "core-js": "^3.1.4",
     "elm-format": "^0.8.1",
-    "fs-extra": "^8.0.1",
+    "fs-extra": "^8.1.0",
     "loader-utils": "^1.2.3",
     "make-promises-safe": "^5.0.0",
-    "prettier-plugin-elm": "^0.4.2",
-    "regenerator-runtime": "^0.13.2",
-    "schema-utils": "^1.0.0",
-    "source-map-support": "^0.5.12"
+    "prettier-plugin-elm": "^0.5.0",
+    "regenerator-runtime": "^0.13.3",
+    "schema-utils": "^2.1.0",
+    "source-map-support": "^0.5.13"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-throw-expressions": "^7.2.0",
     "@babel/plugin-proposal-unicode-property-regex": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/register": "^7.4.4",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
     "babel-plugin-dynamic-import-node": "^2.3.0",
     "babel-plugin-transform-util-promisify": "^0.2.2",
     "elm": "^0.19.0-no-deps",
-    "mocha": "^6.1.4",
+    "mocha": "^6.2.0",
     "prettier": "^1.18.2"
   },
   "optionalDependencies": {
-    "@fortawesome/free-brands-svg-icons": "^5.9.0",
-    "@fortawesome/free-regular-svg-icons": "^5.9.0",
-    "@fortawesome/free-solid-svg-icons": "^5.9.0",
-    "@fortawesome/pro-light-svg-icons": "^5.9.0",
-    "@fortawesome/pro-regular-svg-icons": "^5.9.0",
-    "@fortawesome/pro-solid-svg-icons": "^5.9.0"
+    "@fortawesome/free-brands-svg-icons": "^5.10.1",
+    "@fortawesome/free-regular-svg-icons": "^5.10.1",
+    "@fortawesome/free-solid-svg-icons": "^5.10.1",
+    "@fortawesome/pro-light-svg-icons": "^5.10.1",
+    "@fortawesome/pro-regular-svg-icons": "^5.10.1",
+    "@fortawesome/pro-solid-svg-icons": "^5.10.1"
   },
   "browserslist": [
     "maintained node versions"

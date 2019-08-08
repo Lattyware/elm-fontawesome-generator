@@ -19,5 +19,6 @@ build([
     pkg: "@fortawesome/free-brands-svg-icons",
     pack: "fab"
   }
-]).then(() => console.log("Successful build."))
+])
+  .then(() => console.log("Successful build."))
   .catch(error => throw error);
