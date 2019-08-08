@@ -21,5 +21,12 @@ const iconDefinition = icon => `
 -}
 ${icon.id} : Icon
 ${icon.id} = 
-  Icon "${icon.prefix}" "${icon.name}" ${icon.width} ${icon.height} "${icon.d}"
+  Icon 
+    "${icon.prefix}" 
+    "${icon.name}" 
+    ${icon.width} 
+    ${icon.height} 
+    [${icon.paths.map(path).join(", ")}]
 `;
+
+const path = d => `"${d}"`;

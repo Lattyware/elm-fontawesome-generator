@@ -23,6 +23,11 @@ build([
     name: "Brands",
     pkg: "@fortawesome/free-brands-svg-icons",
     pack: "fab"
+  },
+  {
+    name: "Duotone",
+    pkg: "@fortawesome/pro-duotone-svg-icons",
+    pack: "fad"
   }
 ])
   .then(() => console.log("Successful build."))

@@ -12,7 +12,7 @@ import { styles } from "./template/styles";
 import * as elm from "./template/elm";
 import { icons } from "./template/icons";
 
-const version = "3.1.0";
+const version = "4.0.0";
 
 const exec = promisify(exec_internal);
 
@@ -42,26 +42,32 @@ const templateModule = (name, template) =>
     await exec(`elm-format src/${fileName} --yes`, { cwd: dist });
   });
 
-function styleSuffix(prefix) {
+const styleSuffix = prefix => `?style=${styleSuffixName(prefix)}`;
+
+function styleSuffixName(prefix) {
   switch (prefix) {
     case "fas":
-      return "?style=solid";
+      return "solid";
     case "far":
-      return "?style=regular";
+      return "regular";
     case "fal":
-      return "?style=light";
+      return "light";
     case "fab":
-      return "?style=brands";
+      return "brands";
+    case "fad":
+      return "duotone";
     default:
       throw new Error(`Unknown FontAwesome pack: "${prefix}".`);
   }
 }
 
 function iconDefinition(iconDef) {
-  const [width, height, _ligatures, _unicode, d] = iconDef.icon;
+  const [width, height, _ligatures, _unicode, dOrPaths] = iconDef.icon;
   const name = iconDef.iconName;
   const prefix = iconDef.prefix;
   const link = `${name}${styleSuffix(prefix)}`;
+
+  const paths = typeof dOrPaths === "string" ? [dOrPaths] : dOrPaths;
 
   return {
     name,
@@ -70,7 +76,7 @@ function iconDefinition(iconDef) {
     prefix,
     width,
     height,
-    d
+    paths
   };
 }
 

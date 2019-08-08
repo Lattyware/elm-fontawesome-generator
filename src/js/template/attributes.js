@@ -54,19 +54,29 @@ const categories = [
     title: "Stacked Icons",
     link: "stacking-icons",
     functions: ["stack", "stack-1x", "stack-2x", "inverse"]
+  },
+  {
+    title: "Duotone Icons",
+    link: "duotone-icons",
+    functions: ["swap-opacity"]
   }
 ];
 
 const sections = categories.map(section => ({
   title: section.title,
   link: section.link,
-  functions: section.functions.map(f => ({id: elm.identifier(f), name: "fa-" + f}))
+  functions: section.functions.map(f => ({
+    id: elm.identifier(f),
+    name: "fa-" + f
+  }))
 }));
 
-const functions = sections
-  .flatMap(section => section.functions);
+const functions = sections.flatMap(section => section.functions);
 
-export const attributes = (path) => elm.module(path, `
+export const attributes = path =>
+  elm.module(
+    path,
+    `
 {-| Styling attributes for icons.
 
 ${sections.map(docSection).join("")}
@@ -76,19 +86,22 @@ import Svg
 import Svg.Attributes as SvgA
 
 ${functions.map(attribute).join("")}
-`);
+`
+  );
 
-const docSection = (section) => (`
+const docSection = section => `
 # ${section.title}
 
-[See the FontAwesome docs for details.](https://fontawesome.com/how-to-use/on-the-web/styling/${section.link})
+[See the FontAwesome docs for details.](https://fontawesome.com/how-to-use/on-the-web/styling/${
+  section.link
+})
 
 @docs ${section.functions.map(f => f.id).join(", ")}
-`);
+`;
 
-const attribute = (attribute) => (`
+const attribute = attribute => `
 {-| Apply the ${attribute.name} class to the element. 
 -}
 ${attribute.id} : Svg.Attribute msg
 ${attribute.id} = SvgA.class "${attribute.name}"
-`);
+`;

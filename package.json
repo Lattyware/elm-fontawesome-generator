@@ -1,6 +1,6 @@
 {
   "name": "elm-fontawesome-generator",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "description": "Generate elm modules for FontAwesome icons.",
   "main": "src/elm-fontawesome.js",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
@@ -43,6 +43,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.10.1",
     "@fortawesome/free-regular-svg-icons": "^5.10.1",
     "@fortawesome/free-solid-svg-icons": "^5.10.1",
+    "@fortawesome/pro-duotone-svg-icons": "^5.10.1",
     "@fortawesome/pro-light-svg-icons": "^5.10.1",
     "@fortawesome/pro-regular-svg-icons": "^5.10.1",
     "@fortawesome/pro-solid-svg-icons": "^5.10.1"
