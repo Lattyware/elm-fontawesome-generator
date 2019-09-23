@@ -91,9 +91,14 @@ const packModule = pack =>
   });
 
 const coreModules = {
-  internal: [staticModule(["Transforms", "Internal"])],
+  internal: [
+    staticModule(["Transforms", "Internal"]),
+    staticModule(["Icon", "Internal"]),
+    staticModule(["Svg", "Internal"])
+  ],
   exported: [
     staticModule(["Icon"]),
+    staticModule(["Svg"]),
     templateModule(["Attributes"], attributes),
     templateModule(["Styles"], styles),
     staticModule(["Layering"]),
