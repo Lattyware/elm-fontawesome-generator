@@ -16,5 +16,5 @@ cp -rf ../dist/. .
 git add -A
 if [ "$(git status --porcelain)" ]; then
   git commit -m "${TRAVIS_COMMIT_MESSAGE}"
-    git push --quiet
+  git push --quiet
 fi

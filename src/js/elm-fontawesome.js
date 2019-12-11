@@ -12,7 +12,7 @@ import { styles } from "./template/styles";
 import * as elm from "./template/elm";
 import { icons } from "./template/icons";
 
-const version = "4.0.0";
+const version = "4.1.0";
 
 const exec = promisify(exec_internal);
 
@@ -117,7 +117,10 @@ export async function build(packs) {
   // We need to have the elm.json in place so we can run elm-format on the modules.
   await fs.outputFile(
     `${dist}elm.json`,
-    elm.packageDefinition(version, exported.map(m => m.path))
+    elm.packageDefinition(
+      version,
+      exported.map(m => m.path)
+    )
   );
 
   await Promise.all(modules.map(module => module.write()));
