@@ -6,7 +6,7 @@ const css = dom
   .replace(/(\r\n\t|\n|\r\t)/gm, "")
   .replace(/"/g, '\\"');
 
-export const styles = path =>
+export const styles = (path) =>
   elm.module(
     path,
     `

@@ -7,28 +7,28 @@ build([
   {
     name: "Solid",
     pkg: "@fortawesome/pro-solid-svg-icons",
-    pack: "fas"
+    pack: "fas",
   },
   {
     name: "Regular",
     pkg: "@fortawesome/pro-regular-svg-icons",
-    pack: "far"
+    pack: "far",
   },
   {
     name: "Light",
     pkg: "@fortawesome/pro-light-svg-icons",
-    pack: "fal"
+    pack: "fal",
   },
   {
     name: "Brands",
     pkg: "@fortawesome/free-brands-svg-icons",
-    pack: "fab"
+    pack: "fab",
   },
   {
     name: "Duotone",
     pkg: "@fortawesome/pro-duotone-svg-icons",
-    pack: "fad"
-  }
+    pack: "fad",
+  },
 ])
   .then(() => console.log("Successful build."))
-  .catch(error => throw error);
+  .catch((error) => throw error);

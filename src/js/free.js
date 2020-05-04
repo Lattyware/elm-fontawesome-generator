@@ -7,18 +7,18 @@ build([
   {
     name: "Solid",
     pkg: "@fortawesome/free-solid-svg-icons",
-    pack: "fas"
+    pack: "fas",
   },
   {
     name: "Regular",
     pkg: "@fortawesome/free-regular-svg-icons",
-    pack: "far"
+    pack: "far",
   },
   {
     name: "Brands",
     pkg: "@fortawesome/free-brands-svg-icons",
-    pack: "fab"
-  }
+    pack: "fab",
+  },
 ])
   .then(() => console.log("Successful build."))
-  .catch(error => throw error);
+  .catch((error) => throw error);

@@ -16,18 +16,18 @@ const categories = [
       "7x",
       "8x",
       "9x",
-      "10x"
-    ]
+      "10x",
+    ],
   },
   {
     title: "Fixed Width Icons",
     link: "fixed-width-icons",
-    functions: ["fw"]
+    functions: ["fw"],
   },
   {
     title: "Icons in a List",
     link: "icons-in-a-list",
-    functions: ["ul", "li"]
+    functions: ["ul", "li"],
   },
   {
     title: "Rotating Icons",
@@ -37,43 +37,43 @@ const categories = [
       "rotate-180",
       "rotate-270",
       "flip-horizontal",
-      "flip-vertical"
-    ]
+      "flip-vertical",
+    ],
   },
   {
     title: "Animating Icons",
     link: "animating-icons",
-    functions: ["spin", "pulse"]
+    functions: ["spin", "pulse"],
   },
   {
     title: "Bordered + Pulled Icons",
     link: "bordered-pulled-icons",
-    functions: ["pull-left", "pull-right", "border"]
+    functions: ["pull-left", "pull-right", "border"],
   },
   {
     title: "Stacked Icons",
     link: "stacking-icons",
-    functions: ["stack", "stack-1x", "stack-2x", "inverse"]
+    functions: ["stack", "stack-1x", "stack-2x", "inverse"],
   },
   {
     title: "Duotone Icons",
     link: "duotone-icons",
-    functions: ["swap-opacity"]
-  }
+    functions: ["swap-opacity"],
+  },
 ];
 
-const sections = categories.map(section => ({
+const sections = categories.map((section) => ({
   title: section.title,
   link: section.link,
-  functions: section.functions.map(f => ({
+  functions: section.functions.map((f) => ({
     id: elm.identifier(f),
-    name: "fa-" + f
-  }))
+    name: "fa-" + f,
+  })),
 }));
 
-const functions = sections.flatMap(section => section.functions);
+const functions = sections.flatMap((section) => section.functions);
 
-export const attributes = path =>
+export const attributes = (path) =>
   elm.module(
     path,
     `
@@ -89,17 +89,17 @@ ${functions.map(attribute).join("")}
 `
   );
 
-const docSection = section => `
+const docSection = (section) => `
 # ${section.title}
 
 [See the FontAwesome docs for details.](https://fontawesome.com/how-to-use/on-the-web/styling/${
   section.link
 })
 
-@docs ${section.functions.map(f => f.id).join(", ")}
+@docs ${section.functions.map((f) => f.id).join(", ")}
 `;
 
-const attribute = attribute => `
+const attribute = (attribute) => `
 {-| Apply the ${attribute.name} class to the element. 
 -}
 ${attribute.id} : Svg.Attribute msg

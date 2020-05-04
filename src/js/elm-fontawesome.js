@@ -12,7 +12,7 @@ import { styles } from "./template/styles";
 import * as elm from "./template/elm";
 import { icons } from "./template/icons";
 
-const version = "4.1.0";
+const version = "4.2.0";
 
 const exec = promisify(exec_internal);
 
@@ -24,25 +24,25 @@ const module = (name, write) => {
   const path = ["FontAwesome", ...name];
   return {
     path,
-    write: () => write(path)
+    write: () => write(path),
   };
 };
 
-const staticModule = name =>
-  module(name, async path => {
+const staticModule = (name) =>
+  module(name, async (path) => {
     const fileName = elm.moduleFileName(path);
     await fs.copy(`${srcElm}${fileName}`, `${distSrc}${fileName}`);
   });
 
 const templateModule = (name, template) =>
-  module(name, async path => {
+  module(name, async (path) => {
     const fileName = elm.moduleFileName(path);
     const contents = await template(path);
     await fs.outputFile(`${distSrc}${fileName}`, contents);
     await exec(`elm-format src/${fileName} --yes`, { cwd: dist });
   });
 
-const styleSuffix = prefix => `?style=${styleSuffixName(prefix)}`;
+const styleSuffix = (prefix) => `?style=${styleSuffixName(prefix)}`;
 
 function styleSuffixName(prefix) {
   switch (prefix) {
@@ -76,17 +76,17 @@ function iconDefinition(iconDef) {
     prefix,
     width,
     height,
-    paths
+    paths,
   };
 }
 
-const packModule = pack =>
-  templateModule([pack.name], async path => {
+const packModule = (pack) =>
+  templateModule([pack.name], async (path) => {
     const imported = await import(pack.pkg);
     const iconDefs = Object.values(imported[pack.pack]);
     return icons(path, {
       name: pack.name,
-      icons: iconDefs.map(iconDefinition)
+      icons: iconDefs.map(iconDefinition),
     });
   });
 
@@ -94,7 +94,7 @@ const coreModules = {
   internal: [
     staticModule(["Transforms", "Internal"]),
     staticModule(["Icon", "Internal"]),
-    staticModule(["Svg", "Internal"])
+    staticModule(["Svg", "Internal"]),
   ],
   exported: [
     staticModule(["Icon"]),
@@ -102,8 +102,8 @@ const coreModules = {
     templateModule(["Attributes"], attributes),
     templateModule(["Styles"], styles),
     staticModule(["Layering"]),
-    staticModule(["Transforms"])
-  ]
+    staticModule(["Transforms"]),
+  ],
 };
 
 export async function build(packs) {
@@ -119,9 +119,9 @@ export async function build(packs) {
     `${dist}elm.json`,
     elm.packageDefinition(
       version,
-      exported.map(m => m.path)
+      exported.map((m) => m.path)
     )
   );
 
-  await Promise.all(modules.map(module => module.write()));
+  await Promise.all(modules.map((module) => module.write()));
 }
