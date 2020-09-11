@@ -12,7 +12,7 @@ import { styles } from "./template/styles";
 import * as elm from "./template/elm";
 import { icons } from "./template/icons";
 
-const version = "4.2.0";
+const version = "5.0.0";
 
 const exec = promisify(exec_internal);
 
