@@ -1,10 +1,8 @@
 language: node_js
 
 node_js:
-  - "13"
+  - "14"
   - "12"
-  - "10"
-  - "8"
 
 cache: npm
 
@@ -17,11 +15,11 @@ deploy:
     skip_cleanup: true
     on:
       branch: master
-      node: "13"
+      node: "14"
 
   - provider: script
     script: sh ${TRAVIS_BUILD_DIR}/deploy/deploy-tag.sh
     skip_cleanup: true
     on:
       tags: true
-      node: "13"
+      node: "14"
