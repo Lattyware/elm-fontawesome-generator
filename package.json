@@ -1,72 +1,62 @@
 {
   "name": "elm-fontawesome-generator",
-  "version": "4.2.0",
+  "version": "6.0.0",
   "description": "Generate elm modules for FontAwesome icons.",
-  "main": "src/elm-fontawesome.js",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
   "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/Lattyware/elm-fontawesome-generator#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lattyware/elm-fontawesome-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Lattyware/elm-fontawesome-generator/issues"
+  },
+  "keywords": [
+    "elm",
+    "fontawesome",
+    "icons"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/generator/generator.js"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0 <19.0.0"
+  },
   "scripts": {
-    "compile": "babel src --out-dir build --source-maps",
-    "prepare": "npm run compile",
-    "test": "npm run build && mocha --require @babel/register",
-    "build": "npm run compile && node --harmony build/js/free.js && npm run post-build",
-    "build-pro": "npm run compile && node --harmony build/js/pro.js && npm run post-build",
-    "post-build": "cp -r resources/. dist && cp .gitignore dist"
+    "clean": "rm -rf dist",
+    "prebuild": "rm -rf dist/generator",
+    "build": "npx tsc",
+    "pregenerate": "npm run build && rm -rf dist/lib",
+    "generate": "node dist/generator/cli.js",
+    "predocker:generate": "rm -rf dist/lib",
+    "docker:generate": "docker buildx bake",
+    "predocker:example:generate": "rm -rf dist/example",
+    "docker:example:generate": "docker buildx bake example"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.30",
-    "common-tags": "^1.8.0",
-    "core-js": "^3.6.5",
-    "elm-format": "^0.8.3",
-    "fs-extra": "^9.0.1",
-    "loader-utils": "^2.0.0",
-    "make-promises-safe": "^5.1.0",
-    "regenerator-runtime": "^0.13.7",
-    "schema-utils": "^2.7.1",
-    "source-map-support": "^0.5.19"
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "elm": "^0.19.1-5",
+    "elm-format": "^0.8.5",
+    "loglevel": "^1.8.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.11.6",
-    "@babel/core": "^7.11.6",
-    "@babel/plugin-proposal-throw-expressions": "^7.10.4",
-    "@babel/plugin-proposal-unicode-property-regex": "^7.10.4",
-    "@babel/preset-env": "^7.11.5",
-    "@babel/register": "^7.11.5",
-    "babel-plugin-dynamic-import-node": "^2.3.3",
-    "babel-plugin-transform-util-promisify": "^0.2.2",
-    "elm": "^0.19.1-3",
-    "mocha": "^8.0.0",
-    "prettier": "^2.1.1",
-    "prettier-plugin-elm": "^0.7.0"
+    "@types/node": "^17.0.33",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "eslint": "^8.15.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "prettier": "2.6.2",
+    "prettier-plugin-elm": "^0.8.0",
+    "typescript": "^4.8.0-dev.20220516"
   },
   "optionalDependencies": {
-    "@fortawesome/free-brands-svg-icons": "^5.14.0",
-    "@fortawesome/free-regular-svg-icons": "^5.14.0",
-    "@fortawesome/free-solid-svg-icons": "^5.14.0",
-    "@fortawesome/pro-duotone-svg-icons": "^5.14.0",
-    "@fortawesome/pro-light-svg-icons": "^5.14.0",
-    "@fortawesome/pro-regular-svg-icons": "^5.14.0",
-    "@fortawesome/pro-solid-svg-icons": "^5.14.0"
-  },
-  "browserslist": [
-    "maintained node versions"
-  ],
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "useBuiltIns": "entry",
-          "corejs": 3,
-          "shippedProposals": true
-        }
-      ]
-    ],
-    "plugins": [
-      "transform-util-promisify",
-      "dynamic-import-node",
-      "@babel/plugin-proposal-unicode-property-regex",
-      "@babel/plugin-proposal-throw-expressions"
-    ]
+    "@fortawesome/free-brands-svg-icons": "^6.1.1",
+    "@fortawesome/free-regular-svg-icons": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1"
   }
 }

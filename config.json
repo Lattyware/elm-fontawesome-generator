@@ -1,0 +1,19 @@
+{
+  "version": "6.0.0",
+  "iconSources": [
+    {
+      "name": "Solid",
+      "package": "@fortawesome/free-solid-svg-icons"
+    },
+    {
+      "name": "Regular",
+      "package": "@fortawesome/free-regular-svg-icons"
+    },
+    {
+      "name": "Brands",
+      "package": "@fortawesome/free-brands-svg-icons"
+    }
+  ],
+  "outputPath": "./dist/lib",
+  "verbosity": "info"
+}

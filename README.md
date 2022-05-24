@@ -1,41 +1,100 @@
-# FontAwesome 5 for Elm Generator. [![Build Status](https://travis-ci.com/Lattyware/elm-fontawesome-generator.svg?branch=master)](https://travis-ci.com/Lattyware/elm-fontawesome-generator)
+# FontAwesome for Elm Generator. [![Build](https://github.com/Lattyware/elm-fontawesome-generator/actions/workflows/build.yml/badge.svg)](https://github.com/Lattyware/elm-fontawesome-generator/actions/workflows/build.yml) [![Publish](https://github.com/Lattyware/elm-fontawesome/actions/workflows/publish.yml/badge.svg)](https://github.com/Lattyware/elm-fontawesome/actions/workflows/publish.yml)
 
-This is a package that generates Elm code for [FontAwesome 5][fa]. 
-Most people will be more interested in [the generated library itself][elm-fontawesome].
+This is a package that generates Elm code for [FontAwesome][fa].
+Most people will be more interested in
+[the generated library itself][elm-fontawesome].
 
 [elm-fontawesome]: https://github.com/Lattyware/elm-fontawesome
 [fa]: https://fontawesome.com/
 
 ## How it works.
 
-This package works by generating Elm source code using [the FontAwesome SVG JavaScript Core][fa-core].
+This package works by generating Elm source code using [the FontAwesome SVG
+JavaScript Core][fa-core].
 
-We load icon packs, then generate Elm functions for each icon. When run, these generate the desired SVG icons. This 
-means no need to rely on any external resources - all the data for the icons and supporting styles is encoded into 
+We load icon packs, then generate Elm functions for each icon. When run, these
+generate the desired SVG icons. This means no need to rely on any external
+resources - all the data for the icons and supporting styles is encoded into
 the Elm package.
 
-This does mean that this is a big package, the compiled Elm code weighs in at over 1MB. This would naturally not be 
-ideal in most situations. The good news is that it is easy to minify out any unused icons thanks to Elm's pure nature.
-If you are already minifying your compiled Elm (which is good practice anyway), then you don't need to do anything 
-more. If you are not, then [it is simple to do][minification].
+This does mean that this is a big package, the compiled Elm code weighs in at
+over 1MB. This would naturally not be ideal in most situations. The good news
+is that it is easy to minify out any unused icons thanks to Elm's pure nature.
+If you are already minifying your compiled Elm (which is good practice
+anyway), then you don't need to do anything more. If you are not, then [it is
+simple to do][minification].
 
-[fa-core]: https://fontawesome.com/how-to-use/on-the-web/advanced/svg-javascript-core
+If you need to manually subset the library (most commonly to dynamically
+include icons at runtime, e.g: from user input where tree shaking can't be
+used) you will need to build the library for ourself.
+
+[fa-core]: https://fontawesome.com/docs/web/dig-deeper/svg-core
 [minification]: https://guide.elm-lang.org/optimization/asset_size.html
 
-## Using the elm library.
+## Using the Elm library.
 
-Please see the repository for [the generated library][elm-fontawesome] for more information on using the library.
+Please see the repository for [the generated library][elm-fontawesome] for
+more information on using the library.
+
+For most people, just using that will be the best option, if you wish to
+manually subset, see below on building the library.
 
 [elm-fontawesome]: https://github.com/Lattyware/elm-fontawesome
 
-## Building the elm library.
+## Building the Elm library.
 
-To build the elm package, you will need to first make sure you have the icon packages you want installed.
-The possible packages are included as optional dependencies on the node module. For pro icons you will need to have the 
-[Fort Awesome Pro NPM registry][pro-npm] configured.
+It is recommended to build in a [Docker][get-docker] environment for security
+and consistency.
+Note our build process requires [Buildx/BuildKit][buildx] enabled Docker.
 
-Then run `npm build` or for the free version `npm build-pro` for the pro version. The resulting elm library will be 
-output in `dist`. Unfortunately there is no nice way to work with local packages in Elm as of the time of writing, so
-you will need to copy the source into your application or use an alternative system.
+You can then run `npm run docker:generate` to generate the Elm library into
+the `build` directory.
 
-[pro-npm]: https://fontawesome.com/how-to-use/on-the-web/setup/using-package-managers#installing-pro
+If you would like to build without Docker, you will need Node 18 installed.
+You can install dependencies with `npm install`. Note that [the FontAwesome
+packages are currently broken][font-awesome-bug] and require manual fixing to
+work in node as modules. E.g:
+
+```sh
+for f in node_modules/@fortawesome/_/_.es.js; do mv "$f" "$(echo "$f" | sed s/\.es\.js/\.mjs/)"; done
+for f in node_modules/@fortawesome/*/package.json; do sed -i s/\.es\.js/\.mjs/ "$f"; done
+```
+
+You can then run `npm run generate` to generate the Elm library into the
+build` directory.
+
+You can modify `config.json` to further customise the build.
+
+- `version`: (Required) The version number to output in the generated elm.json
+  file.
+- `iconSources`: (Required) An array of icon sources to include, allowing manual
+  subsetting.
+- `outputPath`: (Default `"dist/lib"`) Where to output the generated files (if
+  running through docker, you will want to edit `docker-bake.hcl` instead.)
+- `verbosity`: (Default `"error"`) One of `"trace"`, `"debug"`, `"info"`,
+  `"warn"`, `"error"`, `"silent"`, determining how much output the generator
+  will produce.
+
+An icon source is either:
+
+- `name`: (Required) The name of the elm module to put the icons from this
+  source in.
+- `icons`: (Required) A list of [FontAwesome `IconDefinition`s][icondefinition]
+  of the icons.
+
+or:
+
+- `name`: (Required) The name of the elm module to put the icons from this
+  source in.
+- `package`: (Required) The name of the NPM package of icons to load. This must
+  expose a `prefix` value which contains the name of the FontAwesome `IconPack`
+  to load.
+- `include`: (Default `"all"`) either `"all"` for all, or an array of the names
+  of the icons to include. If you want to do something more complex, you can
+  run the generator from code and pass a predicate function that takes the
+  IconDefinition instead. See `cli.ts`.
+
+[get-docker]: https://docs.docker.com/get-docker/
+[buildx]: https://docs.docker.com/buildx/working-with-buildx/
+[font-awesome-bug]: https://github.com/FortAwesome/Font-Awesome/pull/19041
+[icondefinition]: https://github.com/FortAwesome/Font-Awesome/blob/6.x/js-packages/%40fortawesome/fontawesome-common-types/index.d.ts#L10=
