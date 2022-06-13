@@ -1,8 +1,13 @@
-# FontAwesome for Elm Generator. [![Build](https://github.com/Lattyware/elm-fontawesome-generator/actions/workflows/build.yml/badge.svg)](https://github.com/Lattyware/elm-fontawesome-generator/actions/workflows/build.yml) [![Publish](https://github.com/Lattyware/elm-fontawesome/actions/workflows/publish.yml/badge.svg)](https://github.com/Lattyware/elm-fontawesome/actions/workflows/publish.yml)
+# FontAwesome for Elm Generator.
+
+[![Generator Build Status](https://img.shields.io/github/workflow/status/lattyware/elm-fontawesome-generator/Build?label=generator%20build&logo=github)](https://github.com/Lattyware/elm-fontawesome-generator/actions/workflows/build.yml)
+[![Package Publish Status](https://img.shields.io/github/workflow/status/lattyware/elm-fontawesome/Publish?label=package%20publish&logo=github)](https://github.com/Lattyware/elm-fontawesome/actions/workflows/publish.yml)
+[![Elm package](https://img.shields.io/elm-package/v/lattyware/elm-fontawesome?logo=elm)](https://package.elm-lang.org/packages/lattyware/elm-fontawesome/latest/)
+[![FontAwesome version](https://img.shields.io/github/package-json/dependency-version/lattyware/elm-fontawesome-generator/@fortawesome/fontawesome-svg-core?label=FontAwesome&logo=fontawesome)](https://github.com/Lattyware/elm-fontawesome-generator/blob/main/package.json)
 
 This is a package that generates Elm code for [FontAwesome][fa].
-Most people will be more interested in
-[the generated library itself][elm-fontawesome].
+Most people will be more interested in [the generated library
+itself][elm-fontawesome].
 
 [elm-fontawesome]: https://github.com/Lattyware/elm-fontawesome
 [fa]: https://fontawesome.com/

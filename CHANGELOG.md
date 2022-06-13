@@ -9,7 +9,7 @@
       - `Icon` has become `IconDef` and `Presentation` has become `Icon`.
       - Icons are now exposed as presentations primarily. Definitions can be
         found one level deeper, as they are rarely needed.
-      - Old convinience methods for working with definitions are gone.
+      - Old convenience methods for working with definitions are gone.
       - `Icon` (formerly `Presentation`) no longer has a `msg` type. This means
         `styled` can no longer accept attributes that can produce messages,
         these can be added with `viewWithAttributes` instead, where needed.
