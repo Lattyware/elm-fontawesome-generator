@@ -52,7 +52,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "prettier": "2.7.1",
     "prettier-plugin-elm": "^0.8.0",
-    "typescript": "^4.8.0-dev.20220516"
+    "typescript": "^4.8.3"
   },
   "optionalDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.1.1",
