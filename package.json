@@ -44,7 +44,7 @@
     "loglevel": "^1.8.0"
   },
   "devDependencies": {
-    "@types/node": "^18.0.1",
+    "@types/node": "^18.14.6",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
     "eslint": "^8.15.0",
