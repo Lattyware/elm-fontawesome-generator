@@ -1,4 +1,4 @@
-ARG NODE_VERSION=18
+ARG NODE_VERSION=21
 ARG ELM_FONTAWESOME_VERSION
 
 
@@ -10,8 +10,8 @@ WORKDIR "/fa"
 # Build the generator.
 FROM base AS build
 
-COPY ["./package.json", "./package-lock.json", "./"]
-RUN ["npm", "ci"]
+COPY ["./package.json", "./package-lock.json", "elm-tooling.json", "./"]
+RUN ["npm", "ci", "--include=dev"]
 
 COPY ["./tsconfig.json", "./"]
 COPY ["./src", "./src"]
@@ -21,12 +21,8 @@ RUN ["npm", "run", "build"]
 # Install only prod dependencies.
 FROM base AS install
 
-COPY ["./package.json", "./package-lock.json", "./"]
-RUN ["npm", "ci", "--ommit=dev"]
-
-# Fix https://github.com/FortAwesome/Font-Awesome/pull/19041 because FA don't ship ES6 modules correctly.
-RUN for f in node_modules/@fortawesome/*/*.es.js; do mv "$f" "$(echo "$f" | sed s/\.es\.js/\.mjs/)"; done
-RUN for f in node_modules/@fortawesome/*/package.json; do sed -i s/\.es\.js/\.mjs/ "$f"; done
+COPY ["./package.json", "./package-lock.json", "elm-tooling.json", "./"]
+RUN ["npm", "ci"]
 
 
 # Image for the generator. 
@@ -39,7 +35,7 @@ COPY ["./config.json", "./"]
 COPY ["./base", "./base"]
 COPY --from=build ["/fa/dist/generator", "./"]
 
-CMD ["node", "./cli.js"]
+CMD ["node", "--enable-source-maps", "./cli.js"]
 
 
 # Actually execute the generator.
@@ -48,7 +44,7 @@ FROM generator AS generate
 ARG ELM_FONTAWESOME_VERSION
 ENV ELM_FONTAWESOME_VERSION=${ELM_FONTAWESOME_VERSION}
 
-RUN ["node", "./cli.js"]
+RUN ["node", "--enable-source-maps", "./cli.js"]
 
 
 # Just keep the generated files.

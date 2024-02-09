@@ -1,3 +1,8 @@
+- 7.0.0
+  
+  - Changed:
+    - Upgraded FontAwesome version.
+
 - 6.0.0
 
   - Changed:

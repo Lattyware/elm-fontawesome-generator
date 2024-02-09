@@ -12,7 +12,6 @@
     "sourceMap": true,
     "rootDir": "src",
     "outDir": "dist/generator",
-    "composite": true,
     "removeComments": true,
     "newLine": "lf",
 
@@ -21,13 +20,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowUnusedLabels": false,
-    "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "importsNotUsedAsValues": "error",
-    "checkJs": true
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true
   }
 }
