@@ -1,4 +1,4 @@
-ARG NODE_VERSION=21
+ARG NODE_VERSION=22
 ARG ELM_FONTAWESOME_VERSION
 
 
@@ -6,34 +6,34 @@ FROM node:${NODE_VERSION}-alpine AS base
 
 WORKDIR "/fa"
 
+COPY --link ["./package.json", "./package-lock.json", "elm-tooling.json", "./"]
+
 
 # Build the generator.
 FROM base AS build
 
-COPY ["./package.json", "./package-lock.json", "elm-tooling.json", "./"]
-RUN ["npm", "ci", "--include=dev"]
+RUN \
+  --mount=type=cache,target=/usr/src/app/.npm \
+  npm set cache /usr/src/app/.npm && \
+  npm ci --include=dev
 
-COPY ["./tsconfig.json", "./"]
-COPY ["./src", "./src"]
-RUN ["npm", "run", "build"]
-
-
-# Install only prod dependencies.
-FROM base AS install
-
-COPY ["./package.json", "./package-lock.json", "elm-tooling.json", "./"]
-RUN ["npm", "ci"]
+COPY --link ["./tsconfig.json", "./"]
+COPY --link ["./src", "./src"]
+RUN npm run build
 
 
 # Image for the generator. 
 # `--target generator` to stop here and get an image to generate with repeatedly.
 FROM base AS generator
 
-COPY ["./package.json", "./"]
-COPY --from=install ["/fa/node_modules", "./node_modules"]
-COPY ["./config.json", "./"]
-COPY ["./base", "./base"]
-COPY --from=build ["/fa/dist/generator", "./"]
+COPY --link ["./config.json", "./"]
+RUN \
+  --mount=type=cache,target=/usr/src/app/.npm \
+  npm set cache /usr/src/app/.npm && \
+  npm ci
+
+COPY --link ["./base", "./base"]
+COPY --link --from=build ["/fa/dist/generator", "./"]
 
 CMD ["node", "--enable-source-maps", "./cli.js"]
 
@@ -50,4 +50,4 @@ RUN ["node", "--enable-source-maps", "./cli.js"]
 # Just keep the generated files.
 FROM scratch AS generated
 
-COPY --from=generate ["/fa/dist/lib/.", "/."]
+COPY --link --from=generate ["/fa/dist/lib/.", "/."]

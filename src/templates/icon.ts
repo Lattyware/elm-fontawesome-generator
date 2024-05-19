@@ -38,7 +38,7 @@ ${icons.map(iconDef).join("")}
   );
 };
 
-function synonym(icon: IconDetails, { name, id }: SynonymDetails) {
+function synonym(icon: IconDetails, { id }: SynonymDetails) {
   return `
 {-| Synonym for \`${icon.id}\`.
 -}

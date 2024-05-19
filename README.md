@@ -15,7 +15,7 @@ itself][elm-fontawesome].
 ## How it works.
 
 This package works by generating Elm source code using [the FontAwesome SVG
-JavaScript Core][fa-core].
+JavaScript Core library][fa-core].
 
 We load icon packs, then generate Elm functions for each icon. When run, these
 generate the desired SVG icons. This means no need to rely on any external
@@ -55,20 +55,15 @@ Note our build process requires [Buildx/BuildKit][buildx] enabled Docker.
 You can then run `npm run docker:generate` to generate the Elm library into
 the `build` directory.
 
-If you would like to build without Docker, you will need Node 18 installed.
-You can install dependencies with `npm install`. Note that [the FontAwesome
-packages are currently broken][font-awesome-bug] and require manual fixing to
-work in node as modules. E.g:
-
-```sh
-for f in node_modules/@fortawesome/_/_.es.js; do mv "$f" "$(echo "$f" | sed s/\.es\.js/\.mjs/)"; done
-for f in node_modules/@fortawesome/*/package.json; do sed -i s/\.es\.js/\.mjs/ "$f"; done
-```
+If you would like to build without Docker, you will need Node 22 installed.
+You can install dependencies with `npm install`.
 
 You can then run `npm run generate` to generate the Elm library into the
 build` directory.
 
-You can modify `config.json` to further customise the build.
+You can modify `config.json` to further customise the build. You can also write a 
+`config.js` file instead to do something more fancy (export the generated config 
+as default).
 
 - `version`: (Required) The version number to output in the generated elm.json
   file.

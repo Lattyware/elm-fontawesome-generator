@@ -1,24 +1,44 @@
 import { default as log } from "loglevel";
 import * as Path from "path";
+import * as Filesystem from "fs/promises";
 
 import type { Config } from "./cli/config.js";
 import { ExitCodes } from "./exit-codes.js";
 import { generate, write } from "./generator.js";
 import * as IconSource from "./icon-source.js";
 
-async function main(): Promise<void> {
+interface ConfigFile {
+  default: Config
+}
+
+const findConfig = async (paths: readonly string[]): Promise<ConfigFile> => {
+  for (const path of paths) {
+    const resolvedPath = Path.resolve(process.cwd(), path);
+    if ((await Filesystem.stat(resolvedPath))?.isFile()) {
+      return (await import(
+        `file:${resolvedPath}`, 
+        resolvedPath.endsWith(".json") ? { with: { type: "json" } } : {}
+      )) as ConfigFile;
+    }
+  }
+  throw new Error(
+    `No config file found, searched for one of ${paths.join(", ")}, ` + 
+    `you can provide a path as an argument or by setting ` + 
+    `ELM_FONTAWESOME_CONFIG_PATH in your environment.`
+  );
+};
+
+const main = async (): Promise<void> => {
   const [maybeConfigPath] = process.argv.slice(2);
   const configPath =
     maybeConfigPath ??
     process.env["ELM_FONTAWESOME_CONFIG_PATH"] ??
-    "./config.json";
+    undefined;
 
-  const config = (await import(
-    `file:${Path.resolve(process.cwd(), configPath)}`,
-    {
-      assert: { type: "json" },
-    }
-  )) as { default: Config };
+  const configPaths = configPath ? 
+    configPath.split(";") : 
+    ["./config.json", "./config.mjs", "./config.js"];
+  const config = await findConfig(configPaths);
 
   const {
     version,
