@@ -1,3 +1,9 @@
+- 7.1.0
+  
+  - Changed:
+    - **Breaking** Tighten required version of core to try and fix issues. 
+    - Modernise build process.
+
 - 7.0.0
   
   - Changed:

@@ -1,6 +1,6 @@
 {
   "name": "elm-fontawesome-generator",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "Generate elm modules for FontAwesome icons.",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
   "license": "GPL-3.0-or-later",
@@ -44,24 +44,19 @@
     "loglevel": "^1.8.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.3.0",
+    "@eslint/js": "^9.4.0",
     "@types/node": "^20.11.17",
-    "eslint": "^9.3.0",
+    "eslint": "^9.4.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
     "prettier": "3.2.5",
     "prettier-plugin-elm": "^0.11.0",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.9.0"
+    "typescript-eslint": "^8.0.0-alpha.24"
   },
   "optionalDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1"
-  },
-  "overrides": {
-    "typescript-eslint": {
-      "eslint": "^9.3.0"
-    }
   }
 }

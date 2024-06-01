@@ -16,7 +16,7 @@
     "newLine": "lf",
 
     "experimentalDecorators": true,
-   
+
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
