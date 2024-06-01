@@ -1,3 +1,8 @@
+- 7.1.1
+
+  - Changed:
+    - Hopefully fixed example build, shouldn't actually change the library.
+
 - 7.1.0
   
   - Changed:

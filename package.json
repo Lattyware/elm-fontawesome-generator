@@ -1,6 +1,6 @@
 {
   "name": "elm-fontawesome-generator",
-  "version": "7.1.0",
+  "version": "7.1.1",
   "description": "Generate elm modules for FontAwesome icons.",
   "author": "Gareth Latty <gareth@lattyware.co.uk>",
   "license": "GPL-3.0-or-later",
