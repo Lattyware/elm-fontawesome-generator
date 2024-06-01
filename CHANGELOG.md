@@ -1,3 +1,9 @@
+- 7.1.2
+
+  - Changed:
+    - Explicitly specify FontAwesome 6.5.2.
+    - Another attempt at fixing example build again.
+
 - 7.1.1
 
   - Changed:
