@@ -24,7 +24,7 @@
     }
   },
   "engines": {
-    "node": ">=22.0.0 <23.0.0"
+    "node": ">=23.0.0 <24.0.0"
   },
   "scripts": {
     "postinstall": "npx elm-tooling install",
@@ -39,24 +39,24 @@
     "docker:example:generate": "docker buildx bake example"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.0",
     "elm-tooling": "^1.14.1",
     "loglevel": "^1.8.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
-    "@types/node": "^20.11.17",
+    "@types/node": "^22.9.1",
     "eslint": "^9.4.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
-    "prettier": "3.2.5",
+    "prettier": "3.3.3",
     "prettier-plugin-elm": "^0.11.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.0.0-alpha.24"
   },
   "optionalDependencies": {
-    "@fortawesome/free-brands-svg-icons": "^6.5.2",
-    "@fortawesome/free-regular-svg-icons": "^6.5.2",
-    "@fortawesome/free-solid-svg-icons": "^6.5.2"
+    "@fortawesome/free-brands-svg-icons": "^6.7.0",
+    "@fortawesome/free-regular-svg-icons": "^6.7.0",
+    "@fortawesome/free-solid-svg-icons": "^6.7.0"
   }
 }
